@@ -8,6 +8,8 @@ namespace SharpCalc.Spreadsheet
 {
     public static class Main
     {
+        static bool run = true;
+
         static List<SpreadsheetObject> spreadsheetObjects = new List<SpreadsheetObject>()
         {
             new SpreadsheetObject(1, 1, "HOME BUDGET", ConsoleColor.Green, ConsoleColor.Black),
@@ -21,22 +23,27 @@ namespace SharpCalc.Spreadsheet
             new SpreadsheetObject(2, 5, "500", ConsoleColor.White, ConsoleColor.Black),
         };
         static int documentColumnsNumber = 10;
-        static int documentRowsNumber = 20;
+        //static int documentRowsNumber = 20;
 
-        const ConsoleColor HeadersBackground = ConsoleColor.Gray;
+        const ConsoleColor HeadersBackground = ConsoleColor.White;
+        const ConsoleColor EvenHeadersBackground = ConsoleColor.Gray;
         const ConsoleColor HeadersForeground = ConsoleColor.Black;
 
         public static void Start()
         {
-            Console.Clear();
-            Console.ResetColor();
-            DrawData();
+            while (run)
+            {
+                DrawData();
+            }
         }
 
         private static void DrawData()
         {
+            Console.Clear();
+            Console.ResetColor();
+
             int columns = 0;
-            int rows = Console.WindowHeight - 1; // <-- available rows in the console minus one row for the user input
+            int rows = GetRowsToDisplay();
             
             int startColumn = 0;
             int startRow = 0;
@@ -56,8 +63,12 @@ namespace SharpCalc.Spreadsheet
 
                 int colWidth = GetColumnWidthBasedOnRows(i + 1);
 
-                Console.BackgroundColor = HeadersBackground;
                 Console.ForegroundColor = HeadersForeground;
+
+                if ((i + 1) % 2 != 0)
+                    Console.BackgroundColor = HeadersBackground;
+                else
+                    Console.BackgroundColor = EvenHeadersBackground;
 
                 Console.Write(i + 1);
                 for (int j = (i + 1).ToString().Length; j < colWidth; j++)
@@ -83,10 +94,13 @@ namespace SharpCalc.Spreadsheet
             // draw row headers
             int top = 1;
             Console.SetCursorPosition(0, top);
-            for (int i = 0; i < documentRowsNumber; i++)
+            for (int i = 0; i < rows; i++)
             {
-                Console.BackgroundColor = HeadersBackground;
                 Console.ForegroundColor = HeadersForeground;
+                if ((i + 1) % 2 != 0)
+                    Console.BackgroundColor = HeadersBackground;
+                else
+                    Console.BackgroundColor = EvenHeadersBackground;
 
                 Console.Write(i + 1);
                 for (int j = (i + 1).ToString().Length; j < GetRowHeaderWidth(); j++)
@@ -102,7 +116,66 @@ namespace SharpCalc.Spreadsheet
                 Console.SetCursorPosition(0, top);
             }
 
-            Console.ReadLine();
+            GetUserInput();
+        }
+
+        private static void GetUserInput()
+        {
+            Console.ResetColor();
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            string input = Console.ReadLine();
+
+            switch (input)
+            {
+                case "exit":
+                    run = false;
+                    return;
+                case "clear":
+                    spreadsheetObjects.Clear();
+                    break;
+            }
+
+            /* BASIC SYNTAX:
+             * ColumnNumber-RowNumber:Action
+             * 
+             * ACTIONS:
+             * Number or text - insert/replace cell
+             * '=' at the start - formula
+             * 
+             * FORMULA SYNTAX:
+             * =NAME(value1;value2;...)
+             */
+
+            string[] mainParams = input.Split(':');
+            string[] addressParams = mainParams[0].Split('-');
+            // check if the user gave column number and row number
+            if (mainParams.Length < 2)
+                return;
+
+            int columnNumber = 0;
+            int rowNumber = 0;
+
+            // check if the given numbers are correct
+            if (int.TryParse(addressParams[0], out columnNumber) == false || int.TryParse(addressParams[1].Replace(":", ""), out rowNumber) == false)
+                return;
+
+            string value = mainParams[1];
+            if (value[0] == '=')
+            {
+                string formula = value.Replace("=", "");
+                string formulaParams = formula.Split('(', ')')[1];
+                string[] insideFormulaParams = formulaParams.Split(';');
+                if (formula.StartsWith("SETCOLOR"))
+                {
+                    string foreground = insideFormulaParams[0];
+                    string background = insideFormulaParams[1];
+                    spreadsheetObjects = DocumentManipulation.SetCellBackground(columnNumber, rowNumber, foreground, background, spreadsheetObjects);
+                }
+            }
+            else
+            {
+                spreadsheetObjects = DocumentManipulation.SetCellValue(columnNumber, rowNumber, value, spreadsheetObjects);
+            }
         }
 
         private static int GetColumnWidthBasedOnRows(int columnNo)
@@ -121,7 +194,12 @@ namespace SharpCalc.Spreadsheet
 
         private static int GetRowHeaderWidth()
         {
-            return documentRowsNumber.ToString().Length + 2;
+            return GetRowsToDisplay().ToString().Length + 2;
+        }
+
+        private static int GetRowsToDisplay()
+        {
+            return Console.WindowHeight - 2; // <-- available rows in the console minus one row for the user input
         }
     }
 }

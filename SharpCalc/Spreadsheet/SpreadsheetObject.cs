@@ -13,6 +13,13 @@ namespace SharpCalc.Spreadsheet
             Background = background;
         }
 
+        public SpreadsheetObject(int column, int row, string value)
+        {
+            Column = column;
+            Row = row;
+            Value = value;
+        }
+
         public SpreadsheetObject()
         {
 
@@ -21,7 +28,22 @@ namespace SharpCalc.Spreadsheet
         public int Column { get; set; }
         public int Row { get; set; }
         public string Value { get; set; }
-        public ConsoleColor Foreground { get; set; }
-        public ConsoleColor Background { get; set; }
+        
+        private ConsoleColor _foregrund = ConsoleColor.White;
+
+        public ConsoleColor Foreground
+        {
+            get { return _foregrund; }
+            set { _foregrund = value; }
+        }
+
+        private ConsoleColor _background = ConsoleColor.Black;
+
+        public ConsoleColor Background
+        {
+            get { return _background; }
+            set { _background = value; }
+        }
+
     }
 }
