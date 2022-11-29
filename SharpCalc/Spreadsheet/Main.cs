@@ -10,23 +10,12 @@ namespace SharpCalc.Spreadsheet
     {
         static bool run = true;
 
-        static List<SpreadsheetObject> spreadsheetObjects = new List<SpreadsheetObject>()
-        {
-            new SpreadsheetObject(1, 1, "HOME BUDGET", ConsoleColor.Green, ConsoleColor.Black),
-            new SpreadsheetObject(1, 2, "Source", ConsoleColor.Cyan, ConsoleColor.Black),
-            new SpreadsheetObject(2, 2, "Value [$]", ConsoleColor.Cyan, ConsoleColor.Black),
-            new SpreadsheetObject(1, 3, "TV", ConsoleColor.White, ConsoleColor.Black),
-            new SpreadsheetObject(2, 3, "50", ConsoleColor.White, ConsoleColor.Black),
-            new SpreadsheetObject(1, 4, "Education", ConsoleColor.White, ConsoleColor.Black),
-            new SpreadsheetObject(2, 4, "20", ConsoleColor.White, ConsoleColor.Black),
-            new SpreadsheetObject(1, 5, "Food", ConsoleColor.White, ConsoleColor.Black),
-            new SpreadsheetObject(2, 5, "500", ConsoleColor.White, ConsoleColor.Black),
-        };
+        static List<SpreadsheetObject> spreadsheetObjects = new List<SpreadsheetObject>();
         static int documentColumnsNumber = 10;
         //static int documentRowsNumber = 20;
 
-        const ConsoleColor HeadersBackground = ConsoleColor.White;
-        const ConsoleColor EvenHeadersBackground = ConsoleColor.Gray;
+        const ConsoleColor HeadersBackground = ConsoleColor.Gray;
+        const ConsoleColor EvenHeadersBackground = ConsoleColor.White;
         const ConsoleColor HeadersForeground = ConsoleColor.Black;
 
         public static void Start()
