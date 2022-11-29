@@ -10,6 +10,11 @@ namespace SharpCalc.Spreadsheet
     {
         public static List<SpreadsheetObject> SetCellValue(int column, int row, string value, List<SpreadsheetObject> list)
         {
+            if (String.IsNullOrWhiteSpace(value))
+            {
+                list.RemoveAll(x => x.Column == column && x.Row == row);
+                return list;
+            }
             if (list.Where(x => x.Column == column && x.Row == row).Count() == 1)
             {
                 foreach (var item in list.Where(x => x.Column == column && x.Row == row))
