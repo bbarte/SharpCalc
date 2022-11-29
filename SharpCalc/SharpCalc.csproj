@@ -49,6 +49,9 @@
     <Compile Include="Spreadsheet\DocumentManipulation.cs" />
     <Compile Include="Spreadsheet\Main.cs" />
     <Compile Include="Spreadsheet\SpreadsheetObject.cs" />
+    <Compile Include="Windows\Helper.cs" />
+    <Compile Include="Windows\HelpWindow.cs" />
+    <Compile Include="Windows\SummaryWindow.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

@@ -10,8 +10,9 @@ namespace SharpCalc.Spreadsheet
     public static class Main
     {
         static bool run = true;
+        public static bool getInput = true;
 
-        static List<SpreadsheetObject> spreadsheetObjects = new List<SpreadsheetObject>();
+        public static List<SpreadsheetObject> spreadsheetObjects = new List<SpreadsheetObject>();
         static int documentColumnsNumber = 10;
         //static int documentRowsNumber = 20;
 
@@ -27,12 +28,13 @@ namespace SharpCalc.Spreadsheet
             {
                 DrawData();
             }
+            Environment.Exit(0);
         }
 
-        private static void DrawData()
+        public static void DrawData()
         {
-            Console.Clear();
             Console.ResetColor();
+            Console.Clear();
 
             int columns = 0;
             int rows = GetRowsToDisplay();
@@ -109,7 +111,8 @@ namespace SharpCalc.Spreadsheet
             }
 
             DrawStatusBar();
-            GetUserInput();
+            if (getInput)
+                GetUserInput();
         }
 
         private static void GetUserInput()
@@ -127,6 +130,12 @@ namespace SharpCalc.Spreadsheet
                     return;
                 case "clear":
                     spreadsheetObjects.Clear();
+                    break;
+                case "help":
+                    Windows.HelpWindow.Start();
+                    break;
+                case "summary":
+                    Windows.SummaryWindow.Start();
                     break;
             }
 
@@ -220,7 +229,7 @@ namespace SharpCalc.Spreadsheet
             Console.BackgroundColor = StatusBarBackground;
             Console.ForegroundColor = StatusBarForeground;
             Console.SetCursorPosition(0, 0);
-            string content = $"SharpCalc v{GlobalVariables.Version} | Total elements: {spreadsheetObjects.Count}";
+            string content = $"SharpCalc v{GlobalVariables.Version} | author: bbarte on github";
             Console.Write(content);
             for (int i = content.Length; i < Console.WindowWidth; i++)
             {
