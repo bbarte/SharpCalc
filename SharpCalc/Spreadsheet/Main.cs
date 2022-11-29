@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -17,6 +18,8 @@ namespace SharpCalc.Spreadsheet
         const ConsoleColor HeadersBackground = ConsoleColor.Gray;
         const ConsoleColor EvenHeadersBackground = ConsoleColor.White;
         const ConsoleColor HeadersForeground = ConsoleColor.Black;
+        const ConsoleColor StatusBarBackground = ConsoleColor.DarkBlue;
+        const ConsoleColor StatusBarForeground = ConsoleColor.Yellow;
 
         public static void Start()
         {
@@ -48,7 +51,7 @@ namespace SharpCalc.Spreadsheet
             int colWidthSum = 0;
             for (int i = 0; i < documentColumnsNumber; i++)
             {
-                Console.SetCursorPosition(GetRowHeaderWidth() + colWidthSum, 0);
+                Console.SetCursorPosition(GetRowHeaderWidth() + colWidthSum, 1); // '1' because of the status bar on the top
 
                 int colWidth = GetColumnWidthBasedOnRows(i + 1);
 
@@ -68,7 +71,7 @@ namespace SharpCalc.Spreadsheet
                 // draw cells
                 foreach (var item in spreadsheetObjects.Where(x => x.Column.Equals(i + 1)))
                 {
-                    Console.SetCursorPosition(GetRowHeaderWidth() + colWidthSum, item.Row);
+                    Console.SetCursorPosition(GetRowHeaderWidth() + colWidthSum, item.Row + 1); // + 1 because of the status bar
                     Console.BackgroundColor = item.Background;
                     Console.ForegroundColor = item.Foreground;
                     Console.Write(item.Value);
@@ -81,7 +84,7 @@ namespace SharpCalc.Spreadsheet
             }
 
             // draw row headers
-            int top = 1;
+            int top = 2; // status bar + columns
             Console.SetCursorPosition(0, top);
             for (int i = 0; i < rows; i++)
             {
@@ -105,6 +108,7 @@ namespace SharpCalc.Spreadsheet
                 Console.SetCursorPosition(0, top);
             }
 
+            DrawStatusBar();
             GetUserInput();
         }
 
@@ -112,6 +116,8 @@ namespace SharpCalc.Spreadsheet
         {
             Console.ResetColor();
             Console.ForegroundColor = ConsoleColor.Yellow;
+
+            Console.SetCursorPosition(0, Console.WindowHeight - 1);
             string input = Console.ReadLine();
 
             switch (input)
@@ -149,6 +155,11 @@ namespace SharpCalc.Spreadsheet
                 return;
 
             string value = mainParams[1];
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                spreadsheetObjects = DocumentManipulation.SetCellValue(columnNumber, rowNumber, value, spreadsheetObjects);
+                return;
+            }
             if (value[0] == '=')
             {
                 string formula = value.Replace("=", "");
@@ -167,6 +178,7 @@ namespace SharpCalc.Spreadsheet
             }
         }
 
+        #region getters
         private static int GetColumnWidthBasedOnRows(int columnNo)
         {
             int maxWidth = 0;
@@ -188,7 +200,32 @@ namespace SharpCalc.Spreadsheet
 
         private static int GetRowsToDisplay()
         {
-            return Console.WindowHeight - 2; // <-- available rows in the console minus one row for the user input
+            return Console.WindowHeight - 3; // <-- available rows in the console minus one row for the user input
+        }
+        //private static int GetColumnNumberToDisplay()
+        //{
+        //    int consoleWidth = Console.WindowWidth;
+        //    int rowWidth = GetRowHeaderWidth();
+        //    int columnCount = 0;
+        //    for (int i = 0; i < consoleWidth; i++)
+        //    {
+        //        if (GetColumnWidthBasedOnRows(i) <= Console.WindowWidth - rowWidth)
+        //            columnCount++;
+        //    }
+        //    return columnCount;
+        //}
+        #endregion
+        private static void DrawStatusBar()
+        {
+            Console.BackgroundColor = StatusBarBackground;
+            Console.ForegroundColor = StatusBarForeground;
+            Console.SetCursorPosition(0, 0);
+            string content = $"SharpCalc v{GlobalVariables.Version} | Total elements: {spreadsheetObjects.Count}";
+            Console.Write(content);
+            for (int i = content.Length; i < Console.WindowWidth; i++)
+            {
+                Console.Write(" ");
+            }
         }
     }
 }
